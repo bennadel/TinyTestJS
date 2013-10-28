@@ -1,0 +1,85 @@
+<!doctype>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="author" content="Ben Nadel, ben@bennadel.com" />
+
+	<title>
+		Tiny Test JS : Test-Driven Development
+	</title>
+
+	<link rel="stylesheet" type="text/css" href="tinytest/css/test-suite.css"></link>
+
+	<script type="text/javascript" src="tinytest/vendor/require/require-2.1.8.js"></script>
+	<script type="text/javascript" src="Application.js"></script>
+	<script type="text/javascript">
+
+		// Set up the configuration for the test suite application.
+		require.config({
+			paths: {
+				jquery: "tinytest/vendor/jquery/jquery-2.0.3.min",
+				lodash: "tinytest/vendor/lodash/lodash-2.2.1",
+				specs: "specs",
+				tinytest: "tinytest"
+			}
+		});
+
+		// Require all of the test cases.
+		require(
+			[ 
+				"lodash",
+				"jquery",
+				"tinytest/lib/TestCase",
+				"specs/TestCase",
+				"specs/ExampleTest" 
+			],
+			function( _, $, CoreTestCase, ProxyTestCase, ExampleTest ) {
+
+				// Release the globals for our utility library.
+				_.noConflict();
+				$.noConflict();
+
+
+				var ProxyConstructor = function() {};
+				ProxyConstructor.prototype = Object.create( CoreTestCase );
+				_.extend( ProxyConstructor.prototype, ProxyTestCase );
+
+
+				var TestCaseConstructor = function() {};
+				TestCaseConstructor.prototype = Object.create( new ProxyConstructor() );
+				_.extend( TestCaseConstructor.prototype, ExampleTest );
+
+				var runner = new TestCaseConstructor();
+
+				for ( var key in runner ) {
+
+					if ( /^test.+/i.test( key ) ) {
+
+						try {
+
+							runner[ key ]();
+
+						} catch ( error ) {
+
+							console.error( error );
+
+						}
+
+					}
+
+				}
+
+				console.log( runner );
+
+
+			}
+		);
+
+	</script>
+</head>
+<body>
+
+	Test
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+define(
+	[
+		// No dependencies.
+	],
+	function( FailError ) {
+
+		return({
+
+			// ---
+			// LIFECYCLE METHODS.
+			// ---
+
+
+			// I get called once after all the test methods have executed.
+			afterTests: function() {
+
+				// Abstract method...
+
+			},
+
+
+			// I get called once before any tests methods have executed.
+			beforeTests: function() {
+
+				// Abstract method...
+
+			},
+
+
+			// I get called before every test method is executed.
+			setup: function() {
+
+				// Abstract method...
+
+			},
+
+
+			// I get called after every test method has executed.
+			teardown: function() {
+
+				// Abstract method...
+
+			},
+
+
+			// ---
+			// ASSERT METHODS.
+			// ---
+
+
+			// I am a short-hand for the assertTrue() method.
+			assert: function( value ) {
+
+				this.assertTrue( value );
+
+			},
+
+
+			// I test to see if the supplied values are equal or not.
+			assertEquals: function( valueA, valueB ) {
+
+				if ( valueA != valueB ) {
+
+					this.fail( "Expected [" + this.stringify( valueA ) + "] to equal [" + this.stringify( valueB ) + "]." );
+
+				}
+
+			},
+
+
+			// I test to see if the supplied value is equal to False.
+			assertFalse: function( value ) {
+
+				if ( value ) {
+
+					this.fail( "Expected [" + this.stringify( value ) + "] to be falsey." );
+
+				}
+
+			},
+
+
+			// I test to see if the supplied values are equal or not.
+			assertNotEquals: function( valueA, valueB ) {
+
+				if ( valueA == valueB ) {
+
+					this.fail( "Expected [" + this.stringify( valueA ) + "] to not equal [" + this.stringify( valueB ) + "]." );
+
+				}
+
+			},
+
+
+			// I test to see if the supplied value is equal to True.
+			assertTrue: function( value ) {
+				
+				if ( ! value ) {
+
+					fail( "Expected [" + this.stringify( value ) + "] to be truthy." );
+				}
+
+			},
+
+
+			// I send a failure message back to the calling application.
+			fail: function( message ) {
+
+				throw( new Error( "tinytest.AssertionFailed" ) );
+
+			},
+
+
+			stringify: function( value ) {
+
+				var undefined;
+
+				if ( value === null ) {
+
+					return( "null" );
+
+				}
+
+				if ( value === undefined ) {
+
+					return( "undefined" );
+
+				}
+
+				return( value.toString() );
+
+				// return( Object.prototype.toString.call( value ) );
+
+			}
+
+		});
+
+	}
+);
