@@ -11,9 +11,9 @@ require.config({
 	}
 });
 
-// NOTE: TinyTestJS makes the "lodash" module available via the "lodash" handle. It
-// will call .noConflict() in case your application already requires lodash or the 
-// underscore library.
+// NOTE: TinyTestJS makes the "lodash" and "jquery" modules available via the "lodash"
+// and "jquery" handles, respectively. It will also call .noConflict() on these modules
+// in case your application already requires lodash, underscore, or the jQuery libraries.
 
 // Since JavaScript cannot read the local file-system, you have to tell TinyTest.js
 // which test-cases that it can find in the "specs/" directory. You will only be 
@@ -23,4 +23,3 @@ require.config({
 require.specs = [
 	"ExampleTest"
 ];
-

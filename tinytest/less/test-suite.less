@@ -67,6 +67,11 @@
 // -- Core -------------------------------------------------- //
 
 
+// To hide the UI until AngularJS has been bootstrapped.
+.ng-cloak {
+	display: none ;
+}
+
 body {
 	background-color: #FFFFFF ;
 	color: #333333 ;
@@ -418,7 +423,6 @@ label.autorun {
 div.processingOverlay {
 	background-color: rgba( 255, 255, 255, .95 ) ;
 	bottom: 0px ;
-	display: none ;
 	left: 0px ;
 	position: fixed ;
 	right: 0px ;

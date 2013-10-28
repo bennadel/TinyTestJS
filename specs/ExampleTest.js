@@ -7,20 +7,44 @@ define(
 
 		return({
 
-			testThis: function() {
+			beforeTests: function() {
 
-				console.log( "testThis" );
-
-				this.assertIsValidEmail( "blam" );
+				// Runs ONCE before ANY the test methods have executed.
 
 			},
 
-			testThat: function() {
 
-				console.log( "testThis" );
+			afterTests: function() {
+
+				// Runs ONCE after ALL the test methods have executed.
+
+			},
+
+
+			testThatThisRuns: function() {
+
+				// Runs failure... if you uncomment any of the following.
+
+				// assert( true == false );
+				// assertIsValidEmail( "ben nadel" );
+				
+			},
+
+
+			testThatThatRuns: function() {
+
+				// Runs successfully...	
+			
+			},
+
+
+			proveThatNonStandardNamesWillNotRun: function() {
+
+				// Since this method name does not start with "test", it should not be invoked by TinyTest.
+				this.fail( "Non-test method invoked incorrectly." );
 
 			}
-
+			
 		});
 
 	}

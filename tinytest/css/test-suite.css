@@ -1,3 +1,6 @@
+.ng-cloak {
+  display: none ;
+}
 body {
   background-color: #FFFFFF ;
   color: #333333 ;
@@ -309,7 +312,6 @@ label.autorun.on {
 div.processingOverlay {
   background-color: rgba(255, 255, 255, 0.95);
   bottom: 0px ;
-  display: none ;
   left: 0px ;
   position: fixed ;
   right: 0px ;

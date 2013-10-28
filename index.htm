@@ -5,81 +5,307 @@
 	<meta name="author" content="Ben Nadel, ben@bennadel.com" />
 
 	<title>
-		Tiny Test JS : Test-Driven Development
+		Tiny Test JS : Test-Driven JavaScript Development
 	</title>
 
+	<!-- Load the stylesheets. -->
 	<link rel="stylesheet" type="text/css" href="tinytest/css/test-suite.css"></link>
 
-	<script type="text/javascript" src="tinytest/vendor/require/require-2.1.8.js"></script>
+	<!--
+		Load the scripts. Note that we are BLOCKING the loading of the Application.js file
+		since we need it in order to properly configure the bootstrapping of the application.
+	-->
+	<script type="text/javascript" src="tinytest/vendor/require/require-2.1.9.min.js"></script>
 	<script type="text/javascript" src="Application.js"></script>
 	<script type="text/javascript">
 
 		// Set up the configuration for the test suite application.
 		require.config({
 			paths: {
+				angular: "tinytest/vendor/angular/angular-1.0.8.min",
 				jquery: "tinytest/vendor/jquery/jquery-2.0.3.min",
-				lodash: "tinytest/vendor/lodash/lodash-2.2.1",
+				lodash: "tinytest/vendor/lodash/lodash-2.2.1.min",
 				specs: "specs",
 				tinytest: "tinytest"
+			},
+			shim: {
+				angular: {
+					deps: [ "jquery" ],
+					exports: "angular"
+				}
 			}
 		});
 
-		// Require all of the test cases.
+		// Load the core libraries, including the AngularJS module.
 		require(
-			[ 
-				"lodash",
-				"jquery",
-				"tinytest/lib/TestCase",
-				"specs/TestCase",
-				"specs/ExampleTest" 
-			],
-			function( _, $, CoreTestCase, ProxyTestCase, ExampleTest ) {
+			[ "lodash", "jquery", "angular" ],
+			function( lodash, jquery, angular ) {
 
-				// Release the globals for our utility library.
-				_.noConflict();
-				$.noConflict();
+				// Define the TinyTest module so we can start defining our controllers.
+				require.tinytest = angular.module( "TinyTest", [] );
 
+				// Release the globals references for our utility library and make them availalbe
+				// to the AngularJS dependency injection container.
+				require.tinytest.value( "_", lodash.noConflict() );
+				require.tinytest.value( "$", jquery.noConflict() );
 
-				var ProxyConstructor = function() {};
-				ProxyConstructor.prototype = Object.create( CoreTestCase );
-				_.extend( ProxyConstructor.prototype, ProxyTestCase );
+				// Configure the $location module to use HTML5 mode. This way, it will parse the 
+				// query string in a natural way (rather than using the URL fragment).
+				require.tinytest.config(
+					function( $locationProvider ) {
 
-
-				var TestCaseConstructor = function() {};
-				TestCaseConstructor.prototype = Object.create( new ProxyConstructor() );
-				_.extend( TestCaseConstructor.prototype, ExampleTest );
-
-				var runner = new TestCaseConstructor();
-
-				for ( var key in runner ) {
-
-					if ( /^test.+/i.test( key ) ) {
-
-						try {
-
-							runner[ key ]();
-
-						} catch ( error ) {
-
-							console.error( error );
-
-						}
+						$locationProvider.html5Mode( true );
 
 					}
+				);
 
-				}
+				// Now that we have defined our TinyTest contianer, let's load all of the modules
+				// and then bootstrap this baby beast.
+				require(
+					[
+						"tinytest/controllers/app-controller.js",
+						"tinytest/directives/auto-run.js"
+					],
+					function() {
 
-				console.log( runner );
+						angular.bootstrap( document, [ "TinyTest" ] );
 
+					}
+				);
 
 			}
 		);
 
 	</script>
 </head>
-<body>
+<body ng-controller="AppController" class="ng-cloak">
 
-	Test
+
+	<!-- BEGIN: Form. -->
+	<form ng-submit="runTests()">
+
+
+		<!-- BEGIN: Site Info. -->
+		<div class="siteInfo">
+
+			<a href="./index.htm" class="name">
+				TinyTestJS
+			</a>
+
+			<span class="tddMentality">
+				Red - Green - Refactor
+			</span>
+
+			<span class="author">
+				by <a href="http://www.bennadel.com" target="bennadelcom">Ben Nadel</a>
+			</span>
+
+		</div>
+		<!-- END: Site Info. -->
+
+
+		<!-- BEGIN: Status Output. -->
+		<div ng-switch="testStatus">
+
+			<!-- BEGIN: Test Status. -->
+			<div ng-switch-when="start" class="testStatus start">
+
+				<button type="submit" class="callToAction">
+
+					<div class="subtitle">
+						<span>Test Driven Development</span>
+					</div>
+
+					<div class="status">
+						Start
+					</div>
+
+					<div class="button">
+						Run Selected Tests
+					</div>
+
+				</button>
+
+			</div>
+			<!-- END: Test Status. -->
+
+
+			<!-- BEGIN: Test Status. -->
+			<div ng-switch-when="pass" class="testStatus pass">
+
+				<button type="submit" class="callToAction">
+
+					<div class="subtitle">
+						<span>You Ran #numberFormat( testResults.getTestCount(), "," )# Tests In #numberFormat( testResults.getDuration(), "," )# ms</span>
+					</div>
+
+					<div class="status">
+						Passed
+					</div>
+
+					<div class="button">
+						Run Tests Again
+					</div>
+
+				</button>
+
+			</div>
+			<!-- END: Test Status. -->
+
+
+			<!-- BEGIN: Test Status. -->
+			<div ng-switch-when="fail" class="testStatus fail">
+
+				<button type="submit" class="callToAction">
+
+					<div class="subtitle">
+						<span>You Ran #numberFormat( testResults.getTestCount(), "," )# Tests In #numberFormat( testResults.getDuration(), "," )# ms</span>
+					</div>
+
+					<div class="status">
+						Failed
+					</div>
+
+					<div class="button">
+						Try Again
+					</div>
+
+					<div class="errorInfo">
+
+						<div class="subtitle">
+							<span>What Went Wrong</span>
+						</div>
+
+						<cfloop
+							index="stackItem"
+							array="#testResults.getError().getStackTrace()#">
+
+							<!--
+								Ignore some aspects of the stack trace that are not relevant to the
+								user's error. These include both ColdFusion and Tiny Test framework files.
+							-->
+							<cfif listFindNoCase( "Application.cfc,test-suite.cfm,TestSuite.cfc,TestCase.cfc", stackItem.fileName )>
+
+								<cfcontinue />
+
+							</cfif>
+
+							<div title="#htmlEditFormat( stackItem.filePath )#" class="file">
+								#stackItem.fileName# : Line #stackItem.lineNumber#
+
+								<!-- Output the contextual method, if available. -->
+								<cfif len( stackItem.methodName )>
+									
+									&mdash; #stackItem.methodName#()
+
+								</cfif>
+							</div>
+
+						</cfloop>
+
+						<div class="message">
+							#htmlEditFormat( testResults.getError().getErrorMessage() )#
+						</div>
+
+					</div>
+
+				</button>
+
+			</div>
+			<!-- END: Test Status. -->
+
+
+		</div>
+		<!-- END: Status Output. -->
+
+
+		<!-- Make sure the user actually has test cases to run. -->
+		<div ng-switch=" !! testCases.length ">
+
+			<!-- BEGIN: Test List. -->
+			<div ng-switch-when="true" class="testList">
+
+				<div class="header">
+
+					<div class="title">
+						<span class="text">You Have {{ testCases.length }} Test Cases</span>
+						<span class="selectAll">( <a href="#" ng-click="selectAllTestCases()">Select All</a> )</span>
+					</div>
+
+					<input type="text" ng-model="form.filter" placeholder="Filter test cases" tabindex="1" class="filter" />
+
+				</div>
+
+				<ol class="tests">
+
+					<li ng-repeat="testCase in testCases | filter:form.filter" class="test">
+
+						<label>
+
+							<input
+								type="checkbox"
+								name="selectedTestCases"
+								ng-value="{{ testCase }}"
+								/>
+
+							{{ testCase }}
+
+						</label>
+
+					</li>
+
+				</ol>
+
+			</div>
+			<!-- END: Test List. -->
+
+
+			<!-- BEGIN: No Test List. -->
+			<div ng-switch-when="false" class="noTestList">
+
+				<strong>Oops</strong>: There are no test cases in your "specs" directory.<br />
+
+				See the <a href="./README.md">Readme.md</a> file for instructions.
+
+			</div>
+			<!-- END: No Test List. -->
+
+		</div>
+
+
+		<!-- BEGIN: Auto-Run. -->
+		<label tt-auto-run for="autorun" class="autorun" ng-class="{ on: form.autoRun }">
+
+			<input id="autorun" type="checkbox" ng-model="form.autoRun" />
+
+			Auto-run tests when window is focused.
+
+		</label>
+		<!-- END: Auto-Run. -->
+
+
+	</form>
+	<!-- END: Form. -->
+
+
+	<!-- BEGIN: Processing. -->
+	<div ng-show="isRunningTests" class="processingOverlay">
+
+		<div class="message">
+
+			<div class="plan">
+				Running <span class="count">{{ selectedTestCount }}</span> Test Cases
+			</div>
+
+			<div class="patience">
+				Get ready to refactor...
+			</div>
+
+		</div>
+
+	</div>
+	<!-- END: Processing. -->
+
 
 </body>
 </html>

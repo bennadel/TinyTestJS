@@ -2,14 +2,9 @@ define(
 	[
 		// No dependencies.
 	],
-	function( FailError ) {
+	function() {
 
 		return({
-
-			// ---
-			// LIFECYCLE METHODS.
-			// ---
-
 
 			// I get called once after all the test methods have executed.
 			afterTests: function() {
@@ -17,35 +12,6 @@ define(
 				// Abstract method...
 
 			},
-
-
-			// I get called once before any tests methods have executed.
-			beforeTests: function() {
-
-				// Abstract method...
-
-			},
-
-
-			// I get called before every test method is executed.
-			setup: function() {
-
-				// Abstract method...
-
-			},
-
-
-			// I get called after every test method has executed.
-			teardown: function() {
-
-				// Abstract method...
-
-			},
-
-
-			// ---
-			// ASSERT METHODS.
-			// ---
 
 
 			// I am a short-hand for the assertTrue() method.
@@ -103,6 +69,14 @@ define(
 			},
 
 
+			// I get called once before any tests methods have executed.
+			beforeTests: function() {
+
+				// Abstract method...
+
+			},
+
+
 			// I send a failure message back to the calling application.
 			fail: function( message ) {
 
@@ -111,6 +85,15 @@ define(
 			},
 
 
+			// I get called before every test method is executed.
+			setup: function() {
+
+				// Abstract method...
+
+			},
+
+
+			// I convert the given value to a string for use with string concatenation.
 			stringify: function( value ) {
 
 				var undefined;
@@ -129,7 +112,13 @@ define(
 
 				return( value.toString() );
 
-				// return( Object.prototype.toString.call( value ) );
+			},
+
+
+			// I get called after every test method has executed.
+			teardown: function() {
+
+				// Abstract method...
 
 			}
 
