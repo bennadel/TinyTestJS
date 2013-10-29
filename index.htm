@@ -19,7 +19,18 @@
 	<script type="text/javascript" src="Application.js"></script>
 	<script type="text/javascript">
 
+		// NOTE: For this application, I am kind of hijacking the "require" namnespace. Since
+		// it is already required that "require" be global (no pun intended), I'm gonna go
+		// ahead and just tack-on any other global that I will need (ex. specs, ex. tinytest).
+		// This way, we keep the pollution of the global namespace to a minimum.
+
+		// -------------------------------------------------------------------------------- //
+		// -------------------------------------------------------------------------------- //
+
 		// Set up the configuration for the test suite application.
+		// --
+		// NOTE: urlArgs are intended to bust the cache while in development and on GitHub.
+		// GitHub has some strong caching rules and JS files get cached for a while.
 		require.config({
 			paths: {
 				angular: "tinytest/vendor/angular/angular-1.0.8.min",
@@ -39,33 +50,41 @@
 
 		// Load the core libraries, including the AngularJS module.
 		require(
-			[ "lodash", "jquery", "angular" ],
-			function( lodash, jquery, angular ) {
+			[ 
+				"lodash",
+				"jquery",
+				"angular",
+				"specs/TestCase"
+			],
+			function( lodash, jquery, angular, proxyTestCase ) {
 
 				// Define the TinyTest module so we can start defining our controllers.
-				require.tinytest = angular.module( "TinyTest", [] );
+				var tinytest = require.tinytest = angular.module( "TinyTest", [] );
 
-				// Release the globals references for our utility library and make them availalbe
+				// Store the specs as an AngularJS value so we can decouple them from the require
+				// namespace beyond this point.
+				tinytest.value( "specs", require.specs );
+
+				// Release the globals references for our utility library and make them available
 				// to the AngularJS dependency injection container.
-				require.tinytest.value( "_", lodash.noConflict() );
-				require.tinytest.value( "$", jquery.noConflict() );
+				tinytest.value( "_", lodash.noConflict() );
+				tinytest.value( "$", jquery.noConflict() );
 
-				// Configure the $location module to use HTML5 mode. This way, it will parse the 
-				// query string in a natural way (rather than using the URL fragment).
-				require.tinytest.config(
-					function( $locationProvider ) {
+				// Store the proxy test case as a value. This is the module that allows the user 
+				// to define common spec-methods for all of their test cases.
+				tinytest.value( "proxyTestCaseMethods", proxyTestCase );
 
-						$locationProvider.html5Mode( true );
-
-					}
-				);
-
-				// Now that we have defined our TinyTest contianer, let's load all of the modules
+				// Now that we have defined our TinyTest container, let's load all of the modules
 				// and then bootstrap this baby beast.
 				require(
 					[
+						"tinytest/beans/test-case.js",
+						"tinytest/beans/test-results.js",
+						"tinytest/beans/test-suite.js",
 						"tinytest/controllers/app-controller.js",
-						"tinytest/directives/auto-run.js"
+						"tinytest/directives/auto-run.js",
+						"tinytest/directives/processing-overlay.js",
+						"tinytest/services/require.js"
 					],
 					function() {
 
@@ -230,7 +249,7 @@
 
 					<div class="title">
 						<span class="text">You Have {{ testCases.length }} Test Cases</span>
-						<span class="selectAll">( <a href="#" ng-click="selectAllTestCases()">Select All</a> )</span>
+						<span class="selectAll">( <a ng-click="selectAllTestCases()">Select All</a> )</span>
 					</div>
 
 					<input type="text" ng-model="form.filter" placeholder="Filter test cases" tabindex="1" class="filter" />
@@ -286,12 +305,12 @@
 
 
 	<!-- BEGIN: Processing. -->
-	<div ng-show="isRunningTests" class="processingOverlay">
+	<div tt-processing-overlay class="processingOverlay">
 
 		<div class="message">
 
 			<div class="plan">
-				Running <span class="count">{{ selectedTestCount }}</span> Test Cases
+				Running <span class="count">{{ selectedTestCases.length }}</span> Test Cases
 			</div>
 
 			<div class="patience">

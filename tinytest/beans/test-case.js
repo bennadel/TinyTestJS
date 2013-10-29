@@ -1,10 +1,19 @@
-define(
-	[
-		// No dependencies.
-	],
-	function() {
+require.tinytest.factory(
+	"TestCase",
+	function( _ ) {
 
-		return({
+		// I initialize the test case with the given spec definition.
+		function TestCase( proxyTestCaseMethods, specTestCaseMethods ) {
+
+			// Override the abstract methods with the proxy test case first, then the spec test case.
+			// This way, the spec test case methods have the highest precedence. 
+			_.extend( this, proxyTestCaseMethods, specTestCaseMethods );
+
+		}
+
+
+		// Define the class methods.
+		TestCase.prototype = {
 
 			// I get called once after all the test methods have executed.
 			afterTests: function() {
@@ -122,7 +131,10 @@ define(
 
 			}
 
-		});
+		};
+
+
+		return( TestCase );
 
 	}
 );

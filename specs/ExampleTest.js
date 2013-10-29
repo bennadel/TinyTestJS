@@ -25,8 +25,8 @@ define(
 
 				// Runs failure... if you uncomment any of the following.
 
-				// assert( true == false );
-				// assertIsValidEmail( "ben nadel" );
+				// this.assert( true == false );
+				// this.assertIsValidEmail( "ben nadel" );
 				
 			},
 

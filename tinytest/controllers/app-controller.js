@@ -1,31 +1,22 @@
 require.tinytest.controller(
 	"AppController",
-	function( $scope, $location, _ ) {
+	function( $scope, require, specs, TestSuite, _ ) {
 
+		// I determine the status of the testing.
 		$scope.testStatus = "start";
 
-		$scope.testCases = _.map(
-			require.specs,
-			function( testCaseName ) {
+		// I keep track of the test cases and the selected test cases.
+		$scope.testCases = buildTestCaseCollection( specs );
+		$scope.selectedTestCases = [];
 
-				return({
-					name: testCaseName,
-					isSelected: false
-				});
-
-			}
-		);
-
-		console.log( $scope.testCases );
-				
+		// I determine if test cases are currently being executed.
 		$scope.isRunningTests = false;
 
-		$scope.selectedTestCount = 0;
-
-		$scope.form = {};
-
-		$scope.form.filter = "";
-		$scope.form.autoRun = !! ( $location.search().autoRun || false );
+		// Form inputs (for ng-model bindings).
+		$scope.form = {
+			filter: "",
+			autoRun: false
+		};
 
 
 		// ---
@@ -33,28 +24,63 @@ require.tinytest.controller(
 		// ---
 
 
+		// I run the selected test cases.
 		$scope.runTests = function() {
 
-			console.log( "Run..." );
+			// If the tests are currently running, ignore the request.
+			if ( $scope.isRunningTests ) {
+
+				return;
+
+			}
+
+			var testCases = updateSelectedTestCases();
+
+			// Ignore run request if no test cases have been selected.
+			if ( ! testCases.length ) {
+
+				return;
+
+			}
+
+			$scope.isRunningTests = true;
 
 			require(
-				[
-					( "specs/ExampleTest.js?ttTestBust=" + Date.now() )
-				],
-				function( foo ) {
+				getTestCaseModuleUrls( testCases ),
+				function success() {
 
-					console.log( foo );
+					// Create a new instance of test suite for the definened specifications.
+					var testSuite = new TestSuite( arguments );
+
+					var results = testSuite.runTestsCases();
+
+					$scope.isRunningTests = false;
+
+					$scope.testStatus = ( results.isPassed() ? "pass" : "fail" );
+					
+				},
+				function error( error ) {
+
+					console.error( error );
+
+					alert( "One of your test cases failed to load (see console)." );
+
+					$scope.isRunningTests = false;
 
 				}
 			);
 
-
 		};
 
 
+		// I select all the available test cases.
 		$scope.selectAllTestCases = function() {
 
-			console.log( "Select all" );
+			for ( var i = 0 ; i < $scope.testCases.length ; i++ ) {
+
+				$scope.testCases[ i ].isSelected = true;
+
+			}
 
 		};
 
@@ -62,6 +88,64 @@ require.tinytest.controller(
 		// ---
 		// PRIVATE METHODS.
 		// ---
+
+
+		// I convert the list of test case names into something we can render with selectability.
+		function buildTestCaseCollection( specs ) {
+
+			var testCases = _.map(
+				specs,
+				function( specName ) {
+
+					return({
+						name: specName,
+						isSelected: false
+					});
+
+				}
+			);
+
+			return( testCases );
+
+		}
+
+
+		// I build a collection of cache-busting URLs for the given, selected test cases. The 
+		// cache-busting ensures that RequireJS will reload the given script each time it is
+		// requested, rather than pulling it out of the module cache.
+		function getTestCaseModuleUrls( testCases ) {
+
+			var now = ( new Date() ).getTime();
+
+			var testCaseUrls = _.map(
+				testCases,
+				function( testCase ) {
+
+					return( "specs/" + testCase.name + ".js?ttTestCaseBust=" + now );
+
+				}
+			);
+
+			return( testCaseUrls );
+
+		}
+
+
+		// I update the collection of selected test cases (and return the collection).
+		function updateSelectedTestCases() {
+
+			$scope.selectedTestCases = _.filter(
+				$scope.testCases,
+				function( testCase ) {
+
+					return( testCase.isSelected );
+
+				}
+			);
+
+			return( $scope.selectedTestCases );
+
+		}
 
 	}
 );
