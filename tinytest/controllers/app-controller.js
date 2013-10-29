@@ -1,11 +1,22 @@
 require.tinytest.controller(
 	"AppController",
-	function( $scope, $location ) {
-
+	function( $scope, $location, _ ) {
 
 		$scope.testStatus = "start";
 
-		$scope.testCases = require.specs;
+		$scope.testCases = _.map(
+			require.specs,
+			function( testCaseName ) {
+
+				return({
+					name: testCaseName,
+					isSelected: false
+				});
+
+			}
+		);
+
+		console.log( $scope.testCases );
 				
 		$scope.isRunningTests = false;
 
@@ -13,6 +24,7 @@ require.tinytest.controller(
 
 		$scope.form = {};
 
+		$scope.form.filter = "";
 		$scope.form.autoRun = !! ( $location.search().autoRun || false );
 
 
@@ -24,6 +36,18 @@ require.tinytest.controller(
 		$scope.runTests = function() {
 
 			console.log( "Run..." );
+
+			require(
+				[
+					( "specs/ExampleTest.js?ttTestBust=" + Date.now() )
+				],
+				function( foo ) {
+
+					console.log( foo );
+
+				}
+			);
+
 
 		};
 
@@ -38,7 +62,6 @@ require.tinytest.controller(
 		// ---
 		// PRIVATE METHODS.
 		// ---
-
 
 	}
 );

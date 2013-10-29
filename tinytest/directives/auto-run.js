@@ -5,15 +5,17 @@ require.tinytest.directive(
 		// I bind the scope to the ui events.
 		function link( $scope, element, attributes ) {
 
-			var win = $( $window );
-
-			win.on(
+			$( $window ).on( 
 				"focus.ttAutoRun",
-				function( event ) {
+				function() {
 
-					console.log( "Auto-run, make it so!" );
+					if ( ! $scope.form.autoRun ) {
 
-					// $window.location = $window.location;
+						return;
+
+					}
+
+					$scope.runTests();
 
 				}
 			);

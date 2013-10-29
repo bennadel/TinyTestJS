@@ -33,7 +33,8 @@
 					deps: [ "jquery" ],
 					exports: "angular"
 				}
-			}
+			},
+			urlArgs: ( "ttCacheBust=" + ( new Date() ).getTime() )
 		});
 
 		// Load the core libraries, including the AngularJS module.
@@ -238,17 +239,13 @@
 
 				<ol class="tests">
 
-					<li ng-repeat="testCase in testCases | filter:form.filter" class="test">
+					<li ng-repeat="testCase in testCases | filter:{name:form.filter}" class="test">
 
 						<label>
 
-							<input
-								type="checkbox"
-								name="selectedTestCases"
-								ng-value="{{ testCase }}"
-								/>
+							<input type="checkbox" ng-model="testCase.isSelected" />
 
-							{{ testCase }}
+							{{ testCase.name }}
 
 						</label>
 
