@@ -21,5 +21,6 @@ require.config({
 // --
 // NOTE: Exclude the trailing ".js" file extension.
 require.specs = [
-	"ExampleTest"
+	"ExampleOfGoodTest",
+	"ExampleOfNotGoodTest"
 ];

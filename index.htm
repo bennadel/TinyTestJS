@@ -78,12 +78,14 @@
 				// Add the global stacktrace utility to the module system.
 				tinytest.value( "printStackTrace", printStackTrace );
 
-				// Store the proxy test case as a value. This is the module that allows the user 
-				// to define common spec-methods for all of their test cases.
+				// Store the proxy test case as a value. This is the method-collection that sits in 
+				// "specs/" directory and allows the user to define core/comment spec-methods for 
+				// all of their test cases.
 				tinytest.value( "proxyTestCaseMethods", proxyTestCase );
 
-				// Now that we have defined our TinyTest container, let's load all of the modules
-				// and then bootstrap this baby beast.
+				// Now that we have defined our TinyTest container, and translated some RequireJS 
+				// modules into AngularJS modules, let's load all of the AngularJS dependencies and
+				// then bootstrap this baby beast.
 				require(
 					[
 						"tinytest/beans/test-case",
@@ -97,7 +99,7 @@
 						"tinytest/services/require",
 						"tinytest/services/stacktrace"
 					],
-					function() {
+					function requireSuccessCallback() {
 
 						angular.bootstrap( document, [ "TinyTest" ] );
 
@@ -105,7 +107,8 @@
 				);
 
 			}
-		);
+		); 
+		// END: require().
 
 	</script>
 </head>

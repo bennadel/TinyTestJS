@@ -26,19 +26,19 @@ define(
 			// Sample test method...
 			testThatThisRuns: function() {
 
-				// Runs failure... if you uncomment any of the following.
-
-				// this.assert( true == false );
-				// this.assertIsValidEmail( "ben nadel" );
-				
+				// Runs successfully...	
+				this.assert( true );
+			
 			},
 
 
 			// Sample test method...
-			testThatThatRuns: function() {
+			testThatThisRunsAsWell: function() {
 
 				// Runs successfully...	
-				this.assert( true );
+				// --
+				// NOTE: assertIsValidEmail() is a custom assertion method in TestCase.js.
+				this.assertIsValidEmail( "ben@bennadel.com" );
 			
 			},
 
