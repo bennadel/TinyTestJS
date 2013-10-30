@@ -5,16 +5,16 @@ require.tinytest.factory(
 		// I initialize the test results.
 		function TestResults() {
 
-			// For duration of testing.
+			// I determine the time delimiters for the duration of testing.
 			this.startTime = this.getTickCount();	
 			this.endTime = 0;
 
-			// The number of test methods that have been executed.
+			// I keep track of the number of test methods that have been executed.
 			this.testCount = 0;
 
-			// Will contain the first error that is raised during testing.
+			// I will contain the first error that is raised during testing. Testing is halted
+			// once the first error is found.
 			this.error = null;
-
 
 		}
 
@@ -22,6 +22,7 @@ require.tinytest.factory(
 		// Define the instance methods.
 		TestResults.prototype = {
 
+			// I finalize the test results with the given error.
 			endTestingWithError: function( error ) {
 
 				if ( this.isComplete() ) {
@@ -37,6 +38,7 @@ require.tinytest.factory(
 			},
 
 
+			// I finalize the test results with a successful completion.
 			endTestingWithSuccess: function() {
 
 				if ( this.isComplete() ) {
@@ -50,6 +52,7 @@ require.tinytest.factory(
 			},
 
 
+			// I get the duration that the test have been running (or have ran until completion).
 			getDuration: function() {
 
 				if ( this.isComplete() ) {
@@ -63,13 +66,21 @@ require.tinytest.factory(
 			},
 
 
+			// I return the underlying error object for tests that failed to complete successfully.
 			getError: function() {
+
+				if ( this.error === null ) {
+
+					throw( new Error( "Error not available." ) );
+
+				}
 
 				return( this.error );
 
 			},
 
 
+			// I return the number of tests that have been executed.
 			getTestCount: function() {
 
 				return( this.testCount );
@@ -77,6 +88,7 @@ require.tinytest.factory(
 			},
 
 
+			// I get the current UTC time in milliseconds.
 			getTickCount: function() {
 
 				return( ( new Date() ).getTime() );
@@ -84,6 +96,7 @@ require.tinytest.factory(
 			},
 
 
+			// I increment the succesfully executed test count.
 			incrementTestCount: function() {
 
 				this.testCount++;
@@ -91,6 +104,7 @@ require.tinytest.factory(
 			},
 
 
+			// I determine if the tests have finished executing.
 			isComplete: function() {
 
 				return( this.endTime !== 0 );
@@ -98,6 +112,7 @@ require.tinytest.factory(
 			},
 
 
+			// I determine if one of the tests failed.
 			isFailed: function() {
 
 				if ( ! this.isComplete() ) {
@@ -111,6 +126,7 @@ require.tinytest.factory(
 			},
 
 
+			// I determine if the tests all executed successfully.
 			isPassed: function() {
 
 				if ( ! this.isComplete() ) {

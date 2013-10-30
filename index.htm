@@ -1,4 +1,4 @@
-<!doctype>
+<!doctype html>
 <html>
 <head>
 	<meta charset="utf-8" />
@@ -37,12 +37,16 @@
 				jquery: "tinytest/vendor/jquery/jquery-2.0.3.min",
 				lodash: "tinytest/vendor/lodash/lodash-2.2.1.min",
 				specs: "specs",
+				printstacktrace: "tinytest/vendor/stacktrace/stacktrace",
 				tinytest: "tinytest"
 			},
 			shim: {
 				angular: {
 					deps: [ "jquery" ],
 					exports: "angular"
+				},
+				printstacktrace: {
+					exports: "printStackTrace"
 				}
 			},
 			urlArgs: ( "ttCacheBust=" + ( new Date() ).getTime() )
@@ -54,9 +58,10 @@
 				"lodash",
 				"jquery",
 				"angular",
+				"printstacktrace",
 				"specs/TestCase"
 			],
-			function( lodash, jquery, angular, proxyTestCase ) {
+			function( lodash, jquery, angular, printStackTrace, proxyTestCase ) {
 
 				// Define the TinyTest module so we can start defining our controllers.
 				var tinytest = require.tinytest = angular.module( "TinyTest", [] );
@@ -70,6 +75,9 @@
 				tinytest.value( "_", lodash.noConflict() );
 				tinytest.value( "$", jquery.noConflict() );
 
+				// Add the global stacktrace utility to the module system.
+				tinytest.value( "printStackTrace", printStackTrace );
+
 				// Store the proxy test case as a value. This is the module that allows the user 
 				// to define common spec-methods for all of their test cases.
 				tinytest.value( "proxyTestCaseMethods", proxyTestCase );
@@ -78,13 +86,16 @@
 				// and then bootstrap this baby beast.
 				require(
 					[
-						"tinytest/beans/test-case.js",
-						"tinytest/beans/test-results.js",
-						"tinytest/beans/test-suite.js",
-						"tinytest/controllers/app-controller.js",
-						"tinytest/directives/auto-run.js",
-						"tinytest/directives/processing-overlay.js",
-						"tinytest/services/require.js"
+						"tinytest/beans/test-case",
+						"tinytest/beans/test-error",
+						"tinytest/beans/test-results",
+						"tinytest/beans/test-suite",
+						"tinytest/controllers/app-controller",
+						"tinytest/directives/auto-run",
+						"tinytest/directives/error-handler",
+						"tinytest/directives/processing-overlay",
+						"tinytest/services/require",
+						"tinytest/services/stacktrace"
 					],
 					function() {
 
@@ -98,11 +109,23 @@
 
 	</script>
 </head>
-<body ng-controller="AppController" class="ng-cloak">
+<body ng-controller="AppController" tt-error-handler>
+
+
+	<!--
+		BEGIN: Initial Loading. This will be seen by the user before the AngularJS application 
+		has been bootstrapped (at which time the elements with "ng-cloak" will be revealed.)
+	-->
+	<div ng-hide="true" class="loading">
+
+		Loading Test Harness		
+
+	</div>
+	<!-- END: Initial Loading. -->
 
 
 	<!-- BEGIN: Form. -->
-	<form ng-submit="runTests()">
+	<form ng-submit="runTests()" class="ng-cloak">
 
 
 		<!-- BEGIN: Site Info. -->
@@ -156,7 +179,7 @@
 				<button type="submit" class="callToAction">
 
 					<div class="subtitle">
-						<span>You Ran #numberFormat( testResults.getTestCount(), "," )# Tests In #numberFormat( testResults.getDuration(), "," )# ms</span>
+						<span>You Ran {{ testResults.getTestCount() }} Tests In {{ testResults.getDuration() }} ms</span>
 					</div>
 
 					<div class="status">
@@ -179,7 +202,7 @@
 				<button type="submit" class="callToAction">
 
 					<div class="subtitle">
-						<span>You Ran #numberFormat( testResults.getTestCount(), "," )# Tests In #numberFormat( testResults.getDuration(), "," )# ms</span>
+						<span>You Ran {{ testResults.getTestCount() }} Tests In {{ testResults.getDuration() }} ms</span>
 					</div>
 
 					<div class="status">
@@ -196,35 +219,17 @@
 							<span>What Went Wrong</span>
 						</div>
 
-						<cfloop
-							index="stackItem"
-							array="#testResults.getError().getStackTrace()#">
+						<div
+							ng-repeat="stackItem in testResults.getError().getStackTrace()"
+							title="{{ stackItem.filePath }}"
+							class="file">
 
-							<!--
-								Ignore some aspects of the stack trace that are not relevant to the
-								user's error. These include both ColdFusion and Tiny Test framework files.
-							-->
-							<cfif listFindNoCase( "Application.cfc,test-suite.cfm,TestSuite.cfc,TestCase.cfc", stackItem.fileName )>
+							{{ stackItem.fileName }} : Line {{ stackItem.lineNumber }}
 
-								<cfcontinue />
-
-							</cfif>
-
-							<div title="#htmlEditFormat( stackItem.filePath )#" class="file">
-								#stackItem.fileName# : Line #stackItem.lineNumber#
-
-								<!-- Output the contextual method, if available. -->
-								<cfif len( stackItem.methodName )>
-									
-									&mdash; #stackItem.methodName#()
-
-								</cfif>
-							</div>
-
-						</cfloop>
+						</div>
 
 						<div class="message">
-							#htmlEditFormat( testResults.getError().getErrorMessage() )#
+							{{ testResults.getError().getErrorMessage() }}
 						</div>
 
 					</div>
@@ -305,7 +310,7 @@
 
 
 	<!-- BEGIN: Processing. -->
-	<div tt-processing-overlay class="processingOverlay">
+	<div tt-processing-overlay class="ng-cloak processingOverlay">
 
 		<div class="message">
 

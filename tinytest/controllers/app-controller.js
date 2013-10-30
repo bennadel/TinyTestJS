@@ -1,6 +1,6 @@
 require.tinytest.controller(
 	"AppController",
-	function( $scope, require, specs, TestSuite, _ ) {
+	function( $scope, require, specs, TestSuite, $log, _ ) {
 
 		// I determine the status of the testing.
 		$scope.testStatus = "start";
@@ -12,16 +12,33 @@ require.tinytest.controller(
 		// I determine if test cases are currently being executed.
 		$scope.isRunningTests = false;
 
+		$scope.testResults = null;
+
 		// Form inputs (for ng-model bindings).
 		$scope.form = {
 			filter: "",
 			autoRun: false
 		};
 
+		// I keep track of any errors that were raised while trying to load the test case scripts.
+		var scriptLoadingError = null;
+
 
 		// ---
 		// PUBLIC METHODS.
 		// ---
+
+
+		// I handle any uncaught errors in thrown by the loading of test case scripts.
+		$scope.handleUncaughtException = function( error ) {
+
+			scriptLoadingError = error;
+			
+			$log.error( error );
+
+			alert( "One of your test cases failed to load (see console)." );
+
+		};
 
 
 		// I run the selected test cases.
@@ -43,27 +60,38 @@ require.tinytest.controller(
 
 			}
 
+			// Reset the script-loading error. This way, we can see if new errors were generated
+			// during the loading of the scripts.
+			scriptLoadingError = null;
+
 			$scope.isRunningTests = true;
 
+			// Load and run the test cases. Each test case will be given a unique URL so that 
+			// RequireJS will be forced to reload them each time.
 			require(
 				getTestCaseModuleUrls( testCases ),
 				function success() {
 
-					// Create a new instance of test suite for the definened specifications.
-					var testSuite = new TestSuite( arguments );
-
-					var results = testSuite.runTestsCases();
-
 					$scope.isRunningTests = false;
 
-					$scope.testStatus = ( results.isPassed() ? "pass" : "fail" );
+					// If there was a problem with the script loading, exit out of the test harness.
+					if ( scriptLoadingError ) {
+
+						return( $scope.testStatus = "start" );
+
+					}
+
+					// Create a new instance of test suite for the defined specifications.
+					var testSuite = new TestSuite( arguments );
+
+					$scope.testResults = testSuite.runTestsCases();
+
+					$scope.testStatus = ( $scope.testResults.isPassed() ? "pass" : "fail" );
 					
 				},
 				function error( error ) {
 
-					console.error( error );
-
-					alert( "One of your test cases failed to load (see console)." );
+					$scope.handleUncaughtException( error );
 
 					$scope.isRunningTests = false;
 

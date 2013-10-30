@@ -1,6 +1,6 @@
 require.tinytest.factory(
 	"TestCase",
-	function( _ ) {
+	function( _, $log ) {
 
 		// I initialize the test case with the given spec definition.
 		function TestCase( proxyTestCaseMethods, specTestCaseMethods ) {
@@ -72,7 +72,7 @@ require.tinytest.factory(
 				
 				if ( ! value ) {
 
-					fail( "Expected [" + this.stringify( value ) + "] to be truthy." );
+					this.fail( "Expected [" + this.stringify( value ) + "] to be truthy." );
 				}
 
 			},
@@ -86,10 +86,46 @@ require.tinytest.factory(
 			},
 
 
+			// I error() the given items to the console if the console is available.
+			error: function() {
+
+				for ( var i = 0, length = arguments.length ; i < length ; i++ ) {
+
+					$log.error( arguments[ i ] );
+
+				}
+
+			},
+
+
 			// I send a failure message back to the calling application.
 			fail: function( message ) {
 
-				throw( new Error( "tinytest.AssertionFailed" ) );
+				throw( new Error( message ) );
+
+			},
+
+
+			// I info() the given items to the console if the console is available.
+			info: function() {
+
+				for ( var i = 0, length = arguments.length ; i < length ; i++ ) {
+
+					$log.info( arguments[ i ] );
+
+				}
+
+			},
+
+
+			// I log() the given items to the console if the console is available.
+			log: function() {
+
+				for ( var i = 0, length = arguments.length ; i < length ; i++ ) {
+
+					$log.log( arguments[ i ] );
+
+				}
 
 			},
 
@@ -128,6 +164,18 @@ require.tinytest.factory(
 			teardown: function() {
 
 				// Abstract method...
+
+			},
+
+
+			// I warn() the given items to the console if the console is available.
+			warn: function() {
+
+				for ( var i = 0, length = arguments.length ; i < length ; i++ ) {
+
+					$log.warn( arguments[ i ] );
+
+				}
 
 			}
 

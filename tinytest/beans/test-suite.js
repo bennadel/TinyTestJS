@@ -1,6 +1,6 @@
 require.tinytest.factory(
 	"TestSuite",
-	function( TestCase, proxyTestCaseMethods, TestResults, _ ) {
+	function( TestCase, proxyTestCaseMethods, TestResults, TestError, _ ) {
 
 		// I initialize the test suite.
 		function TestSuite( specs ) {
@@ -85,7 +85,7 @@ require.tinytest.factory(
 
 				} catch ( error ) {
 
-					this.results.endTestingWithError( error );
+					this.results.endTestingWithError( new TestError( error ) );
 
 				}
 
