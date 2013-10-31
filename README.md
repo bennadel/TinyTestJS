@@ -11,9 +11,9 @@ JavaScript does not have access to the local file system, Tiny Test JS requires 
 more configuration. That said, it's intended to be extremely light-weight; you just drop
 it in, tell it what test specifications area available, and open it in the browser.
 
-![Tiny Test JS in action][screenshot]
-
 __[DEMO: View Tiny Test JS in action][demo]__
+
+![Tiny Test JS in action][screenshot]
 
 ## Loading Specs (ie, Test Cases)
 
