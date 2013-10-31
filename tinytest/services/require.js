@@ -1,6 +1,6 @@
 require.tinytest.factory(
 	"require",
-	function( $rootScope, $log ) {
+	function( $rootScope ) {
 
 		// Since the callbacks in the RequireJS module will take the control-flow outside 
 		// of the normal AngularJS context, we need to create a proxy that will automatically
@@ -8,10 +8,11 @@ require.tinytest.factory(
 		// to add some error handling.
 		function requireProxy( dependencies, successCallback, errorCallback ) {
 
-			// Make sure the callbacks are defined - makes the logic easier down below.
+			// Make sure the callbacks are defined - this makes the logic easier down below.
 			successCallback = ( successCallback || angular.noop );
 			errorCallback = ( errorCallback || agular.noop );
 
+			// NOTE: This "require" reference is the core, global reference.
 			require(
 				( dependencies || [] ),
 				function successCallbackProxy() {

@@ -94,7 +94,7 @@
 						"tinytest/beans/test-suite",
 						"tinytest/controllers/app-controller",
 						"tinytest/directives/auto-run",
-						"tinytest/directives/error-handler",
+						"tinytest/directives/global-error-handler",
 						"tinytest/directives/processing-overlay",
 						"tinytest/services/require",
 						"tinytest/services/stacktrace"
@@ -112,7 +112,7 @@
 
 	</script>
 </head>
-<body ng-controller="AppController" tt-error-handler>
+<body ng-controller="AppController" tt-global-error-handler>
 
 
 	<!--
@@ -135,7 +135,7 @@
 		<div class="siteInfo">
 
 			<a href="./index.htm" class="name">
-				TinyTestJS
+				TinyTest JS
 			</a>
 
 			<span class="tddMentality">
@@ -312,7 +312,7 @@
 	<!-- END: Form. -->
 
 
-	<!-- BEGIN: Processing. -->
+	<!-- BEGIN: Processing Overlay. -->
 	<div tt-processing-overlay class="ng-cloak processingOverlay">
 
 		<div class="message">
@@ -328,7 +328,7 @@
 		</div>
 
 	</div>
-	<!-- END: Processing. -->
+	<!-- END: Processing Overlay. -->
 
 
 </body>

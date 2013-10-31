@@ -2,7 +2,7 @@ require.tinytest.controller(
 	"AppController",
 	function( $scope, require, specs, TestSuite, $log, _ ) {
 
-		// I determine the status of the testing.
+		// I determine the status of the testing (start, pass, fail).
 		$scope.testStatus = "start";
 
 		// I keep track of the test cases and the selected test cases.
@@ -12,6 +12,7 @@ require.tinytest.controller(
 		// I determine if test cases are currently being executed.
 		$scope.isRunningTests = false;
 
+		// I keep track of the results of the most recent test.
 		$scope.testResults = null;
 
 		// Form inputs (for ng-model bindings).
@@ -20,7 +21,10 @@ require.tinytest.controller(
 			autoRun: false
 		};
 
-		// I keep track of any errors that were raised while trying to load the test case scripts.
+		// I keep track of any errors that were raised while trying to load the test case 
+		// scripts. Since error handling is a bit wonky in RequireJS (due to browser issues),
+		// we can listen for uncaught errors during loading, and then check for their existence
+		// within the callbacks.
 		var scriptLoadingError = null;
 
 
@@ -36,12 +40,14 @@ require.tinytest.controller(
 			
 			$log.error( error );
 
+			// NOTE: This is not really where this should be; but, to keep things simple, we'll
+			// go with an alert rather than something less DOM-oriented.
 			alert( "One of your test cases failed to load (see console)." );
 
 		};
 
 
-		// I run the selected test cases.
+		// I run the currently-selected test cases.
 		$scope.runTests = function() {
 
 			// If the tests are currently running, ignore the request.
@@ -51,6 +57,7 @@ require.tinytest.controller(
 
 			}
 
+			// Gather the selected test cases.
 			var testCases = updateSelectedTestCases();
 
 			// Ignore run request if no test cases have been selected.
@@ -70,7 +77,7 @@ require.tinytest.controller(
 			// RequireJS will be forced to reload them each time.
 			require(
 				getTestCaseModuleUrls( testCases ),
-				function success() {
+				function successCallback() {
 
 					$scope.isRunningTests = false;
 
@@ -81,7 +88,6 @@ require.tinytest.controller(
 
 					}
 
-					// Create a new instance of test suite for the defined specifications.
 					var testSuite = new TestSuite( arguments );
 
 					$scope.testResults = testSuite.runTestsCases();
@@ -89,11 +95,11 @@ require.tinytest.controller(
 					$scope.testStatus = ( $scope.testResults.isPassed() ? "pass" : "fail" );
 					
 				},
-				function error( error ) {
-
-					$scope.handleUncaughtException( error );
+				function errorCallback( error ) {
 
 					$scope.isRunningTests = false;
+
+					$scope.handleUncaughtException( error );
 
 				}
 			);

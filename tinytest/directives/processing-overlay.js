@@ -5,14 +5,15 @@ require.tinytest.directive(
 		// I bind the scope to the ui events.
 		function link( $scope, element, attributes ) {
 
-			// Since the tests will never be running when the page loads, start with the element 
-			// hidden from view.
+			// Since the tests will never be running when the page loads, start with the element
+			// hidden from view; this will prevent a flicker from occuring during the initial 
+			// watch-configuration.
 			element.hide();
 
 			// Show and hide the overlay as the tests are run.
 			$scope.$watch(
 				"isRunningTests",
-				function( newValue, oldValue ) {
+				function isRunningTestsWatcher( newValue, oldValue ) {
 
 					// Ignore initial configuration of watcher.
 					if ( newValue === oldValue ) {
@@ -54,6 +55,9 @@ require.tinytest.directive(
 			// Show the overlay.
 			function showOverlay() {
 
+				// Since the fade-in/out can add visual noise on short test-runs, we don't 
+				// want to show it immediately; rather, let's wait a bit to see if the tests
+				// complete. If so, we won't show anything.
 				element
 					.delay( 500 )
 					.fadeIn( 200 )
