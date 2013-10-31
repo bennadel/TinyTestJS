@@ -13,9 +13,9 @@ it in, tell it what test specifications area available, and open it in the brows
 
 ![Tiny Test JS in action][screenshot]
 
-Live Demo ... coming soon...
+__[DEMO: View Tiny Test JS in action][demo]__
 
-## Loading Spec (ie, Test Cases)
+## Loading Specs (ie, Test Cases)
 
 Tiny Test JS will look in the "specs" directory for your test cases. It is considered a
 best practice to name your test cases such that the end with the term, "Test." The 
@@ -143,4 +143,5 @@ community.
 [streamlined]: https://github.com/bennadel/Streamlined-Object-Modeling
 [tinytest]: https://github.com/bennadel/TinyTest
 [screenshot]: ./tinytest/screenshots/pass.png?raw=true
+[demo]: http://bennadel.github.io/TinyTestJS
 [jasmine]: http://pivotal.github.io/jasmine/
