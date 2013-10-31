@@ -143,5 +143,5 @@ community.
 [streamlined]: https://github.com/bennadel/Streamlined-Object-Modeling
 [tinytest]: https://github.com/bennadel/TinyTest
 [screenshot]: ./tinytest/screenshots/pass.png?raw=true
-[demo]: http://bennadel.github.io/TinyTestJS
+[demo]: http://bennadel.github.io/TinyTestJS/
 [jasmine]: http://pivotal.github.io/jasmine/
