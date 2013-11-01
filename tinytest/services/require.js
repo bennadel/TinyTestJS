@@ -10,7 +10,7 @@ require.tinytest.factory(
 
 			// Make sure the callbacks are defined - this makes the logic easier down below.
 			successCallback = ( successCallback || angular.noop );
-			errorCallback = ( errorCallback || agular.noop );
+			errorCallback = ( errorCallback || angular.noop );
 
 			// NOTE: This "require" reference is the core, global reference.
 			require(
