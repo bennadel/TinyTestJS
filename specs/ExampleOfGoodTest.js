@@ -28,7 +28,7 @@ define(
 
 				// Runs successfully...	
 				this.assert( true );
-			
+
 			},
 
 
@@ -40,6 +40,21 @@ define(
 				// NOTE: assertIsValidEmail() is a custom assertion method in TestCase.js.
 				this.assertIsValidEmail( "ben@bennadel.com" );
 			
+			},
+
+
+			// Sample test method...
+			testThatThisFailsOhSoGood: function() {
+
+				// Expected to run unsuccessfully... which makes it successful.
+				this.assertFail(
+					function() {
+
+						var x = y; // Y is undefined.
+
+					}
+				);
+
 			},
 
 
