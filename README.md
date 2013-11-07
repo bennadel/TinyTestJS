@@ -34,9 +34,9 @@ Tiny Test JS application:
 ```JavaScript
 // Configure the path mappings for the modules in your application.
 require.config({
+	baseUrl: "../../app/model",
 	paths: {
-		app: "../../app",
-		lib: "../../app/lib"
+		/* Moar paths! */
 	}
 });
 
