@@ -155,4 +155,4 @@ community.
 [tinytest]: https://github.com/bennadel/TinyTest
 [screenshot]: ./tinytest/screenshots/pass.png?raw=true
 [demo]: http://bennadel.github.io/TinyTestJS/
-[jasmine]: http://pivotal.github.io/jasmine/
+[jasmine]: https://jasmine.github.io/
